@@ -1,0 +1,14 @@
+.idea
+*.py[cod]
+*.log
+*.zip
+.ftpconfig
+nohup.out
+xml_sensors.txt
+weather.py
+thermostat.*
+venv/
+raspi-lcd-zibase.py
+config.ini
+PyZiBase/
+Zapi/
