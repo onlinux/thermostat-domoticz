@@ -25,7 +25,7 @@ ip_domoticz=
 port= <8080>
 username= <username if exists>
 password= <password to access your domoticz server>
-
+</pre>
 
 # Start Thermostat Domoticz
 
