@@ -1,4 +1,4 @@
-#!/home/eric/python/thermostat-domoticz/venv/bin/python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # Author: Eric Vandecasteele (c)2014
@@ -737,7 +737,7 @@ except:
 
 thermostat = open_thermostat(config)
 
-display = 2  # Set the Default display here
+display = 3  # Set the Default display here
 
 # update interval in seconds
 if display == 2 or display == 3:

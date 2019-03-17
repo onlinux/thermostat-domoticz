@@ -2,10 +2,11 @@
 svt_thermostat_temp=87
 
 [secret]
+server= <your server name>
 ip_domoticz=
-port=8080
-username=
-password=
+port=<8080>
+username= <username if exists>
+password= <password to access your domoticz server>
 
 [feedback]
 enable=false
