@@ -8,11 +8,12 @@
 # Installation libraries:
 
 `git clone https://github.com/onlinux/thermostat-domoticz.git`
-`cd thermostat-domoticz`
 
 run:
 
- `$ sh setup.sh`
+`cd thermostat-domoticz`
+
+`$ sh setup.sh`
 
 # Configuration
 
