@@ -1,4 +1,4 @@
-# Thermostat-Domoticz with Python and pygame
+# Control your Smart Virtual Thermostat-Domoticz with Python and pygame
 
 <img  src="/Images/Screenshot_20181229_155406.png" alt=" SVT Thermostat" />
 <img  src="/Images/Screenshot_20181229_155153.png" alt=" SVT Thermostat Action screen" />
