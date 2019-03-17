@@ -17,10 +17,10 @@ import urllib2 as request
 import base64
 import urllib
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 # create console handler and set level to debug
 ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
+ch.setLevel(logging.INFO)
 
 # create formatter
 formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s:%(message)s')
@@ -132,6 +132,7 @@ class SVT(object):
                     self.indoorProbeId = device["Mode1"]
                     self.outdoorProbeId = device["Mode2"]
                     self.switchId = device["Mode3"]
+
 
     def rotate(self, l, y=1):
         if len(l) == 0:
@@ -355,18 +356,12 @@ class SVT(object):
                 "type=command&param=setsetpoint&idx={}&setpoint={}".format(self.setpointEconomyId, v))
             return v
 
-
     def getProbes(self):
         logger.debug("getProbes")
         devicesAPI = self.DomoticzAPI(
             "type=devices&filter=temp&used=true&order=ID")
         if devicesAPI:
-            probes = devicesAPI["result"]
-            # for device in devicesAPI["result"]:
-            #     logger.debug(device["Name"])
-
-            return probes
-
+            return devicesAPI["result"]
 
     def DomoticzAPI(self, APICall):
         start = time.time()
@@ -405,5 +400,6 @@ class SVT(object):
                 return resultJson
             else:
                 elapsed = (time.time() - start) * 1000
-                logger.debug("Calling domoticz API: {}  [{:.0f} ms]".format(url,elapsed))
+                logger.debug(
+                    "Calling domoticz API: {}  [{:.0f} ms]".format(url, elapsed))
                 return resultJson
