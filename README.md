@@ -20,16 +20,17 @@ Modify config.ini
 
 <pre>
 [secret]
-server= <enter your domoticz server name>
+server= # Enter your domoticz server name
 ip_domoticz=
 port= <8080>
-username= <username if exists>
-password= <password to access your domoticz server>
+username=  # Enter username if exists
+password=  # Enter password to access your domoticz server
 </pre>
 
 # Start Thermostat Domoticz
 
 `source venv/bin/activate`
+
 `python z.py`
 
 'Alt-PageDown' key or 'n' key to roll over the 4 available displays
