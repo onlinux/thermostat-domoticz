@@ -54,7 +54,7 @@ configPath = path + CONFIG_INI
 installPath = path + '/VClouds Weather Icons/'
 logfile = path + '/thermostat.log'
 logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s',
-                    filename=logfile, level=logging.DEBUG)
+                    filename=logfile, level=logging.INFO)
 
 # Default locationCode (Toulouse-FRXX0099)
 index = 0
@@ -107,7 +107,7 @@ def renderMode(lcd, mode, color=(0,   0,   0)):
     lcd.blit(text, textrect)
 
 
-def renderSetpoint(lcd, setpoint, textAnchorY=10, color=(0,   0,   0)):
+def renderSetpoint(lcd, setpoint, textAnchorY, icon, color=(0,   0,   0)):
     font = fontTemp
     str = tempStr(setpoint)
     text = font.render(str, True, (255, 255, 255))
@@ -116,15 +116,15 @@ def renderSetpoint(lcd, setpoint, textAnchorY=10, color=(0,   0,   0)):
     lcd.fill(color, (120, textAnchorY, 120, size[1] + 2))
     textrect.center = (175, textAnchorY + int(size[1] / 2))
     lcd.blit(text, textrect)
-    lcd.blit(iconDay.bitmap, (80, textAnchorY))
+    lcd.blit(icon.bitmap, (80, textAnchorY))
 
 
 def renderSetpointDay(lcd, setpoint):
-    renderSetpoint(lcd, setpoint, 10)
+    renderSetpoint(lcd, setpoint, 10, iconDay)
 
 
 def renderSetpointNight(lcd, setpoint):
-    renderSetpoint(lcd, setpoint, 65)
+    renderSetpoint(lcd, setpoint, 65, iconNight)
 
 
 def tempStr(value):
