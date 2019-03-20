@@ -594,19 +594,21 @@ def settingCallback(n):
         mode = thermostat.prevMode()
         renderMode(lcd, mode)
     elif n == 2:
-        setpointNormal = thermostat.setpointNormal + 0.1
+        setpointNormal = setpointNormal + 0.1
         renderSetpointDay(lcd, setpointNormal)
     elif n == 1:
-        setpointNormal = thermostat.setpointNormal - 0.1
+        setpointNormal = setpointNormal - 0.1
         renderSetpointDay(lcd, setpointNormal)
     elif n == 4:
-        setpointEconomy = thermostat.setpointEconomy + 0.1
+        setpointEconomy = setpointEconomy + 0.1
         renderSetpointNight(lcd, setpointEconomy)
     elif n == 3:
-        setpointEconomy = thermostat.setpointEconomy - 0.1
+        setpointEconomy = setpointEconomy - 0.1
         renderSetpointNight(lcd, setpointEconomy)
     elif n == 7:
         print "cancel"
+        setpointEconomy = thermostat.setpointEconomy
+        setpointNormal = thermostat.setpointNormal
         display = 3
         RenderThermostatThread().start()
     elif n == 8:
@@ -736,6 +738,8 @@ except:
     config = None
 
 thermostat = open_thermostat(config)
+setpointEconomy = thermostat.setpointEconomy
+setpointNormal = thermostat.setpointNormal
 
 display = 3  # Set the Default display here
 
