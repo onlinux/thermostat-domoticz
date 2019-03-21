@@ -75,8 +75,8 @@ mode = None
 def open_thermostat(config):
     ip = config.get(
         'secret', {
-            "server": "domoticz.onlinux.fr"}).get(
-        'server', 'domoticz.onlinux.fr')
+            "server": "domoticz.server.fr"}).get(
+        'server', 'domoticz.server.fr')
     port = config.get(
         'secret', {
             "port": "80"}).get(

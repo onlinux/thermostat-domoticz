@@ -23,7 +23,15 @@ import fnmatch
 from SVT import SVT
 from icon import Icon, Button
 from snipshelpers.config_parser import SnipsConfigParser
+import RPi.GPIO as GPIO
 
+#setup GPIO using Broadcom SOC channel numbering
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(22, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
+GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
+GPIO.setup(18, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
+#Set up backlight GPIO  
+os.system("sudo sh -c 'echo 252 > /sys/class/gpio/export'")
 # Give the system a quick break
 time.sleep(0.5)
 
@@ -75,12 +83,12 @@ mode = None
 def open_thermostat(config):
     ip = config.get(
         'secret', {
-            "server": "domoticz.onlinux.fr"}).get(
-        'server', 'domoticz.onlinux.fr')
+            "ip_domoticz": "192.168.0.160"}).get(
+        'ip_domoticz', '192.168.0.160')
     port = config.get(
         'secret', {
-            "port": "80"}).get(
-        'secret', '80')
+            "port": "8080"}).get(
+        'secret', '8080')
     username = config.get(
         'secret', {
             "username": "username"}).get(
@@ -169,7 +177,8 @@ for sig in [signal.SIGTERM, signal.SIGINT, signal.SIGHUP, signal.SIGQUIT]:
 class PiTft:
     'Pi Tft screen class'
     screen = None
-
+    backlight = 0
+    
     def __init__(self, bgc=BLACK):
         """
         Initializes a new pygame screen using the framebuffer.
@@ -178,17 +187,33 @@ class PiTft:
         disp_no = os.getenv("DISPLAY")
         if disp_no:
             print "I'm running under X display = {0}".format(disp_no)
+	os.putenv('SDL_FBDEV', '/dev/fb1')
+        os.putenv('SDL_MOUSEDRV', 'TSLIB')
+        os.putenv('SDL_MOUSEDEV', '/dev/input/touchscreen')
+        # Check which frame buffer drivers are available
+        # Start with fbcon since directfb hangs with composite output
+        drivers = ['fbcon', 'directfb', 'svgalib']
+        found = False
+        for driver in drivers:
+            # Make sure that SDL_VIDEODRIVER is set
+            if not os.getenv('SDL_VIDEODRIVER'):
+                os.putenv('SDL_VIDEODRIVER', driver)
+            try:
+           	pygame.display.init()
+       	    except pygame.error:
+            	print 'Driver: {0} failed.'.format(driver)
+		continue
+	    found = True
+	    break
 
-        try:
-            pygame.display.init()
-        except pygame.error:
-            print 'Driver:  failed.'
+	if not found:
+            raise Exception('No suitable video driver found!')
 
         pygame.display.set_caption('Domoticz SVT Pi')
         size = (320, 240)
         print("Framebuffer size: %d x %d" % (size[0], size[1])	)
         self.screen = pygame.display.set_mode(size)
-        pygame.mouse.set_visible(True)
+        pygame.mouse.set_visible(False)
         # Clear the screen to start
         self.bgc = bgc
         self.screen.fill(self.bgc)
@@ -210,6 +235,32 @@ class PiTft:
     def setBackgroundColour(self, colour=None):
         if colour != None:
             self.bgc = colour
+    
+    def setBacklightOff(self):                                                                                                                                   
+        if (self.backlight == 0):                                                                                                                                
+            os.system(" sudo sh -c 'echo 'out' > /sys/class/gpio/gpio252/direction'")                                                                            
+            self.backlight = 1                                                                                                                                   
+            logging.debug(" sudo sh -c 'echo 'out' > /sys/class/gpio/gpio252/direction'")                                                                        
+            time.sleep(0.5)                                                                                                                                      
+        elif (self.backlight == 2):                                                                                                                              
+            os.system("sudo sh -c 'echo '0' > /sys/class/gpio/gpio252/value'")                                                                                   
+            self.backlight = 3                                                                                                                                   
+            logging.debug(" sudo sh -c 'echo '0' > /sys/class/gpio/gpio252/value'")                                                                              
+            time.sleep(0.5)                                                                                                                                      
+            
+    def setBacklightOn(self):   
+        if (self.backlight == 1) or (self.backlight == 3):  
+            os.system(" sudo sh -c 'echo '1' > /sys/class/gpio/gpio252/value'")  
+            self.backlight = 2  
+            logging.debug(" sudo sh -c 'echo '1' > /sys/class/gpio/gpio252/value'") 
+            time.sleep(0.5)  
+            
+    def toggleBacklight(self, channel):
+        print 'toggleBacklight args:', channel
+        if self.backlight == 2 or self.backlight == 0:
+            self.setBacklightOff()
+        else:
+            self.setBacklightOn()
 
 
 class RenderTimeThread(threading.Thread):
@@ -754,6 +805,9 @@ lastupdate = 0
 # define a variable to control the main loop
 running = True
 try:
+    GPIO.add_event_detect(22, GPIO.FALLING, callback=scope.toggleBacklight, bouncetime=300)
+    GPIO.add_event_detect(27, GPIO.FALLING, callback=showNextLocation, bouncetime=300)
+    GPIO.add_event_detect(18, GPIO.FALLING, callback=showNextDisplay, bouncetime=300)
 
     time_stamp = time.time()
 
@@ -778,17 +832,17 @@ try:
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                    # change the value to False, to exit the main loop
+                # change the value to False, to exit the main loop
                 running = False
 
             pressed_keys = pygame.key.get_pressed()
 
-            if pressed_keys[pygame.K_PAGEDOWN] or pressed_keys[pygame.K_n]:
-                showNextDisplay(1)
+            #if pressed_keys[pygame.K_ ] or pressed_keys[pygame.K_n]:
+                #showNextDisplay(1)
 
-            if pressed_keys[pygame.K_ESCAPE]:
-                print 'K_ESCAPE'
-                running = False
+            #if pressed_keys[pygame.K_ESCAPE]:
+                #print 'K_ESCAPE'
+                #running = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 print "screen pressed"  # for debugging purposes
@@ -805,3 +859,5 @@ try:
         time.sleep(0.2)
 finally:
     logging.info("  Quit")
+    # Reset GPIO settings
+    GPIO.cleanup()
