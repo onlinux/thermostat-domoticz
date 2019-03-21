@@ -366,8 +366,8 @@ class SVT(object):
     def DomoticzAPI(self, APICall):
         start = time.time()
         resultJson = None
-        url = "https://{}/json.htm?{}".format(
-            self.ip, urllib.quote(APICall, '&='))
+        url = "http://{}:{}/json.htm?{}".format(
+            self.ip, self.port,  urllib.quote(APICall, '&='))
 
         req = request.Request(url)
 
